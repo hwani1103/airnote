@@ -1,6 +1,20 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
+import { SWRConfig } from "swr";
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+//SWRConfig는, _app.tsx에 적용해서
+//모든 페이지에 적용되어 fetcher같은것의 기본값을 지정할 수 있는
+//Provider이다.
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <SWRConfig
+      value={{
+        fetcher: (url: string) =>
+          fetch(url).then((response) => response.json()),
+      }}
+    >
+      <Component {...pageProps} />
+    </SWRConfig>
+  );
 }
+export default MyApp;

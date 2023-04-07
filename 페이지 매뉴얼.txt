@@ -1,0 +1,187 @@
+========================================프론트코드
+
+==========[components/layout.tsx]
+모든 페이지를 감싸서 navbar나 로그인유무를 보여주려고 만든 컴포넌트
+
+여기서 문제가 좀 있음.
+iron-session을 활용해서 세션 로그인방식을 채택했는데
+로그인유무 및 로그인 회원정보를 useSWR(`api/users/me`)훅을 통해 
+가져온다. 이 훅에서 iron-session의 함수가 호출되고
+이때 iron-session은 세션객체가 없으면 401에러를 내버림.
+그 말은, 로그인을 성공해서 세션이 생긴 뒤부터
+api/users/me가 적합하다는거. 한마디로 로그인 유무가 아니라
+로그인이 된 회원이 누구인지를 식별하는 훅으로 쓰여야함.
+지금 나는 로그인 유무, 즉 세션의 유무만을 검증하는 훅이 없음.
+그걸 만들어야 자잘한 에러가 나지 않을 듯.
+
+==========[pages/index.tsx]
+홈페이지 초기화면
+
+특별히 하는건 없고 Layout컴포넌트로 감싸졌음.
+
+==========[pages/enter.tsx]
+이메일 입력, 토큰 입력 등 실제 로그인을 진행하는 화면.
+
+email과 token form 두개를 각각 useForm을 사용하여 구현.
+2개의 useMutation으로 POST요청을 함.
+하나는, email을 전송하여 이메일과 토큰을 생성하고 연결함
+/api/users/enter
+
+다른 하나는 사용자에게 token을 입력받아 생성된 token과 일치하는지 확인.
+/api/users/confirm
+두개의 mutation은 useForm의 register가 적용된 form의 onSubmit이벤트에
+onValid함수를 넣어줘서 실행됨.
+loading중에는 return하게 하여 악의적인 요청을 막았고
+POST요청을 전송한뒤에는 useEffect에 의해 알맞은 작업이 수행됨.
+
+==========[note/index.tsx]
+note의 list를 보여주거나, 랜덤으로 note를 가져오도록 하고
+새로운 note를 작성할 수 있는 화면.
+
+useSWR(/api/note) GET요청으로 모든 note를 조회한다.
+useSWR(api/users/me)를 통해, 비로그인 회원에게도 note목록을 보여주지만
+새로운 Note를 등록할 수 있는 버튼은 보여주지 않음.
+추후 로직 구현에 따라 바뀔 수 있음.
+일단 지금은, /api/note에서 가져온 data를 map으로 순회하며
+렌더링해주고 있음.
+
+==========[note/create.tsx]
+새로운 note를 작성하는 화면.
+
+당연히 useForm을 사용하고, api/note로 POST요청을 보냄.
+form에 입력한 정보로 새로운 Note를 만들고, 서버에서 응답에
+새로 만든 Note의 id를 같이 응답해주면
+그 id를 받아와서 바로 note detail로 리다이렉트 한다.
+그 외 특별한건 없음.
+
+==========[note/[id]/index.tsx]
+개별 note의 detail 화면.
+
+useSWR(/api/users/me)
+로그인 정보를 얻어와서, 자기가 쓴 글이면 수정/삭제기능을 추가해야 함.
+useSWR(/api/note/${router.query.id})
+해당하는 note의 정보를 얻어와서 렌더링해야함.
+게시글 삭제의 경우, 특별히 복잡한 로직이 없기때문에
+useMutation을 사용하는 API endpoint를 만들지 않고
+함수를 만들어서 fetch하여 구현함.
+
+==========[note/[id]/update.tsx]
+개별 note를 수정하는 update 화면.
+
+useForm 사용.
+useSWR로 /api/note/${router.query.id}/update로 겟요청.
+이 요청은 해당하는 note의 정보를 일단 받아와서, 이어서 수정할 수 있게 하는것
+defaultValue로 넣어준다.
+useMutation으로 /api/note/${router.query.id}/update로 post요청. 진짜 수정 요청.
+
+========================================서버코드
+
+====================[api/users/me/index.ts]
+withApiSession O
+session에 있는 user의 id를 통해 회원을 조회하는 API.
+
+즉, 현재 로그인 한 회원의 정보를 가져와서 반환한다.
+해당 API를 요청하면 회원의 정보를 알 수 있음.
+여기서 중요한것. 이 훅은 로그인 회원의 정보를 가져오는거지
+로그인을 했는지 안했는지를 알아보려는 훅이 아님. 물론 그렇게 사용할 수 도 있지만
+세션이 없는 상태에서 이 훅을 요청하면, 401에러가 계속 발생한다.
+이건 해결해야 할 부분. 나는 Layout 컴포넌트에서 이 훅을 사용하기 때문에..
+나중에 좀더 입맛에 맞는 훅을 구현해서 대체해야하나 싶기도 함.
+나는 대부분의 화면은 로그인 안해도 접근은 가능하게 할거라서
+이 훅은, 모든 페이지에 useUser를 구현해서 비로그인 회원자는 로그인으로 유도하게 하는
+프로젝트에서 구현된거라, 나랑 약간 안맞을 수 있음.일단 알고 있자
+
+====================[api/users/enter.ts]
+withApiSession X
+회원이 이메일을 입력하면, 이메일과 토큰을 생성하고 연결한다.
+
+이 때 prisma에 connectOrCreate라는 게 사용되는데
+이메일이 이미 있으면, 토큰만 생성해서 연결하고, 없으면 이메일과 토큰을 모두 생성해서 연결함.
+그 외에 추가적으로 토큰 유효시간을 설정하는 로직을 추가했음.
+토큰 유효시간을 15분으로 설정하고, 유져의 이메일과 연결된 토큰이 있나 조회한뒤
+유효시간이 지나면, 기존 토큰을 삭제하고 새로운 토큰을 만들어서 토큰을 저장함.
+**여기서 토큰을 실제로 센드그리드로 이메일 보내는건 나중에 구현해야함!
+유효시간이 아직 유효하면 그대로 토큰 입력창으로 보내면 됨.
+**그러니까 처음에 토큰을 이메일로 보내는거랑, 15분후에 다시 보내주는거. 구현해야 함.
+
+====================[api/users/confirm.ts]
+withApiSession O
+토큰을 입력받고 그 토큰을 찾아봄으로써 로그인을 성공시킴.
+
+딱히 그 토큰이 사용자의 이메일과 일치하는지는 검증 안하는듯?
+이건 나중에 추가해도 좋을것같은데.아무튼
+로그인 성공 처리는 req.session에 user.id를 저장하는것으로 구현.
+이때문에 withApiSession함수로 감싸졌음.
+세션에 유져를 할당하면, session.save()를 통해 세션을 저장 및 암호화
+로그인 성공 처리가 되면, 그 user에게 발급된 token을 전부 삭제한다.
+
+====================[api/users/logout.ts]
+withApiSession O
+로그아웃시키는 API.
+
+별다른 로직은 아직 없음. 그냥 이 요청이 오면 무조건 session.destroy()를 한다.
+어떤 로직이 추가로 필요할지, 고민해봐야 함.
+
+====================[api/note/index.ts]
+withApiSession O
+GET요청을 받아 모든 Note를 가져오고, POST요청을 받아 새로운 Note를 생성하는 API
+
+GET요청이 오면, 모든 Note를 조회한다. 이 때 필요한 데이터만 적절히 조회하는게 중요.
+지금은 user까지 가져온다.
+응답은 ok:true와 noteList(전체 Note 배열)
+POST요청이 오면 세션으로부터 user객체를 얻어온 뒤,
+req에 있는 title, content를 가지고 새로운 Note를 만듦.
+딱히 특별한건 없다.
+응답은 ok:true와 새로만들어진 Note의 id. (바로 리다이렉트 시키려고.)
+
+====================[api/note/[id]/index.ts]
+withApiSession O -> X
+note의 detail을 보여주기 위해 하나의 note를 찾아주는 API
+
+잠깐 시간을 좀 쏟았는데, 비로그인 회원도 개별 고민을 읽어볼 수 는 있게 하려고 함.
+그래서 withApiSession을 제외하고, isPrivate : false를 넣어줬다.
+
+로직은 간단함, req.query.id와 일치하는 note를 가져와서 원하는 필드를 조회한다.
+끝.
+
+====================[api/note/[id]/update.ts]
+withApiSession O
+개별 Note를 수정하는 API.
+
+GET요청에 대해서는 해당 note의 정보를 반환해준다.
+수정에 있어서 사용자경험을 위해, 기존 정보를 보여줌.
+POST요청을 받기 이전에, 먼저 해당 Note의 작성 회원과
+현재 로그인 회원이 일치하는가의 검증을 먼저 실시하도록
+코드를 추가했음.
+세션 유져id와 note userid를 비교.
+통과하면, update메서드로 note를 수정한다.
+특별한건 없다.
+
+====================[api/note/[id]/delete.ts]
+withApiSession O
+개별 Note를 삭제하는 API
+
+update와 마찬가지로, 현재 회원이 해당 Note를 삭제할 권한이 있는지
+먼저 검증하고, 삭제한다. 
+
+========================================추가코드
+
+====================[withHandler.ts]
+HTTP요청을 처리하는 handler를 감싸는 함수인 withHandler를 정의.
+
+withHandler는 handler를 method타입, private유무, handler를 매개변수로 받고
+사전 검증과 에러처리로직을 추가하여 handler를 실행하는 함수를 반환한다.
+method가 사전에 허용한 타입으로 들어왔는지, isPrivate이라면 세션에 유져가 있는지 등을 검증하고
+에러가 발생하면, 500에러를 내고 리턴한다.
+500에러가 나면 여기서 에러가 났을 확률이 높음.
+
+
+
+
+
+
+
+
+
+
+

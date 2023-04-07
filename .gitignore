@@ -34,3 +34,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env
+package-lock.json
+package.json
+
+.gitignore
+막쓰기.txt
+정리.txt
+

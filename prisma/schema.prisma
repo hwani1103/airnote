@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  email         String?        @unique
+  nickname      String?
+  age           Int?
+  occupation    String?
+  gender        String?
+  tokens        Token[]
+  notes         Note[]
+  cheers        Cheer[]
+  replies       Reply[]
+  notifications Notification[]
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  payload   String   @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int?
+
+  @@index([userId])
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  content   String   @db.MediumText
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  Int
+  cheers  Cheer[]
+  replies Reply[]
+
+  @@index([userId])
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reply     String   @db.MediumText
+  score     Int      @default(1)
+
+  note          Note           @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId        Int
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  notifications Notification[]
+
+  @@index([userId])
+  @@index([noteId])
+}
+
+model Cheer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  note   Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId Int
+
+  @@index([userId])
+  @@index([noteId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  reply   Reply @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  replyId Int
+
+  @@index([userId])
+  @@index([replyId])
+}
