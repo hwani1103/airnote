@@ -18,8 +18,11 @@ interface newNoteInfo {
 
 const NoteCreate: NextPage = () => {
   const router = useRouter();
-  const { register, handleSubmit, reset } = useForm<NoteCreateForm>();
+
   const [mutate, { loading, data }] = useMutation<newNoteInfo>("/api/note");
+
+  const { register, handleSubmit, reset } = useForm<NoteCreateForm>();
+
   const onValid = (form: NoteCreateForm) => {
     mutate(form);
   };
@@ -28,6 +31,7 @@ const NoteCreate: NextPage = () => {
       router.push(`/note/${data.noteId}`);
     }
   }, [data, router]);
+
   return (
     <Layout>
       <div>

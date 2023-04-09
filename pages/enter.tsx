@@ -24,6 +24,11 @@ interface mutateResult {
 const Enter: NextPage = () => {
   const router = useRouter();
 
+  const [enterMutate, { loading: enterLoading, data: enterData }] =
+    useMutation<mutateResult>("/api/users/enter");
+  const [tokenMutate, { loading: tokenLoading, data: tokenData }] =
+    useMutation<mutateResult>("/api/users/confirm");
+
   const {
     register: enterRegister,
     handleSubmit: enterSubmit,
@@ -31,11 +36,6 @@ const Enter: NextPage = () => {
   } = useForm<EnterForm>();
   const { register: tokenRegister, handleSubmit: tokenSubmit } =
     useForm<TokenForm>();
-
-  const [enterMutate, { loading: enterLoading, data: enterData }] =
-    useMutation<mutateResult>("/api/users/enter");
-  const [tokenMutate, { loading: tokenLoading, data: tokenData }] =
-    useMutation<mutateResult>("/api/users/confirm");
 
   const emailValid = (email: EnterForm) => {
     if (enterLoading) return;

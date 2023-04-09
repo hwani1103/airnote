@@ -9,6 +9,8 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id } } = req;
+  // 로그인 한 user의 id랑.
+  // 이 note가 들고있는 replis중에서, 그 reply의 userId가 같은게 있는지 없는지를 알아야함.
 
   const noteInfo = await client.note.findUnique({
     where: {
@@ -20,7 +22,6 @@ async function handler(
       cheers: true,
       replies: true,
       createdAt: true,
-
       user: {
         select: {
           nickname: true,
@@ -31,7 +32,6 @@ async function handler(
         }
       }
     }
-
   })
 
   res.json({
@@ -45,4 +45,5 @@ export default
     handler,
     isPrivate: false,
   })
+
 

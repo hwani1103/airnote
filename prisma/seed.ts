@@ -6,14 +6,13 @@ const client = new PrismaClient();
 
 async function main() {
   [...Array.from(Array(500).keys())].forEach(async (item) => {
-    await client.stream.create({
+    await client.note.create({
       data: {
-        name: String(item),
-        description: String(item),
-        price: item,
+        title: `${item}번째 title`,
+        content: `${item}번째 content`,
         user: {
           connect: {
-            id: 16,
+            id: 5,
           },
         },
       },

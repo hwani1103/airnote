@@ -8,43 +8,48 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
 
-  const { query: { id }, body: { title, content }, session: { user } } = req;
-
+  const { query: { id, no }, body: { replyUpdate }, session: { user } } = req;
   if (req.method === 'GET') {
 
-    const noteUpdate = await client.note.findUnique({
+    const prevReply = await client.reply.findFirst({
       where: {
-        id: Number(id),
+        noteId: Number(id),
+        id: Number(no),
       },
       select: {
-        title: true,
-        content: true,
+        reply: true,
+        userId: true,
+        user: {
+          select: {
+            nickname: true,
+          }
+        }
       }
     })
 
     res.json({
       ok: true,
-      noteUpdate,
+      prevReply,
     });
+
   } else if (req.method === 'POST') {
-    const noteAuthor = await client.note.findUnique({
+    const replyAuthor = await client.reply.findUnique({
       where: {
-        id: Number(id)
+        id: Number(no)
       },
       select: {
         userId: true,
       }
     })
-    if (noteAuthor?.userId !== user?.id) {
+    if (replyAuthor?.userId !== user?.id) {
       return res.status(404).json({ ok: false })
     }
-
-    await client.note.update({
+    await client.reply.update({
       where: {
-        id: Number(id),
+        id: Number(no),
       },
       data: {
-        title, content,
+        reply: replyUpdate,
       }
     })
 

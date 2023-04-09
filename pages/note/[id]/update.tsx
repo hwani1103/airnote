@@ -19,23 +19,26 @@ interface noteUpdateForm {
 
 const NoteUpdate: NextPage = () => {
   const router = useRouter();
-  const { register, handleSubmit, reset } = useForm<noteUpdateForm>();
-  const { data: noteData } = useSWR<noteUpdate>(
+
+  const { data: noteData, mutate: prevDataMutate } = useSWR<noteUpdate>(
     router.query.id ? `/api/note/${router.query.id}/update` : ""
   );
+
   const [mutate, { loading, data }] = useMutation(
     `/api/note/${router.query.id}/update`
   );
+
+  const { register, handleSubmit, reset } = useForm<noteUpdateForm>();
 
   const onValid = (form: noteUpdateForm) => {
     if (loading) return;
     mutate(form);
   };
-
   useEffect(() => {
     // 이런 Case에서, if(data)가 없으면, data가 undefined일떄도 useEffect의 콜백이 동작하므로 조심해야함.
     if (data) {
       returnDetailPage();
+      prevDataMutate();
     }
   }, [data]);
 
@@ -44,6 +47,7 @@ const NoteUpdate: NextPage = () => {
       router.push(`/note/${router.query.id}`);
     }
   };
+
   return (
     <Layout>
       <div>

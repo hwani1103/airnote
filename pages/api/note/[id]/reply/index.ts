@@ -7,40 +7,41 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
-  const { skip = 0, take = 2 } = req.query;
+
+  const { query: { id } } = req;
+
   if (req.method === 'GET') {
-    const noteList = await client.note.findMany({
-      take: +take,
-      skip: +skip,
+    const noteInfo = await client.note.findUnique({
+      where: {
+        id: Number(id),
+      },
+
       select: {
         title: true,
         content: true,
-        createdAt: true,
-        id: true,
         userId: true,
         user: {
           select: {
             nickname: true,
             id: true,
           }
-        },
-        _count: {
-          select: {
-            replies: true,
-            cheers: true,
-          }
         }
       }
     })
-    res.json({ ok: true, noteList })
 
+    res.json({
+      ok: true, noteInfo
+    });
   } else if (req.method === 'POST') {
-
-    const { body: { title, content } } = req;
-    const { session: { user } } = req;
-    const newNote = await client.note.create({
+    const { body: { reply, author, userId }, session: { user } } = req;
+    const newReply = await client.reply.create({
       data: {
-        title, content,
+        reply,
+        note: {
+          connect: {
+            id: Number(id),
+          }
+        },
         user: {
           connect: {
             id: user?.id,
@@ -48,8 +49,25 @@ async function handler(
         }
       }
     })
+    await client.notification.create({
+      data: {
+        message: `${author}님이 회원님의 게시글에 댓글을 달았습니다.`,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        reply: {
+          connect: {
+            id: newReply.id
+          }
+        }
+      },
+    })
 
-    res.json({ ok: true, noteId: newNote.id });
+    res.json({
+      ok: true, replyId: newReply.id
+    });
   }
 }
 
@@ -57,6 +75,7 @@ export default withApiSession(
   withHandler({
     methods: ["GET", "POST"],
     handler,
-    isPrivate: false
+    isPrivate: false,
   })
 );
+
