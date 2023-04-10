@@ -58,6 +58,12 @@ export default function Layout({ children }: LayoutProps) {
               >
                 Note
               </Link>
+              <Link
+                className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
+                href={`/profile/${data?.profile?.id}`}
+              >
+                Profile
+              </Link>
             </div>
             {data?.ok ? (
               <div className="flex flex-col">

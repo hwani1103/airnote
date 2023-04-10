@@ -8,10 +8,12 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
   const { skip = 0, take = 2 } = req.query;
+  console.log(skip, take)
   if (req.method === 'GET') {
     const noteList = await client.note.findMany({
       take: +take,
       skip: +skip,
+      orderBy: { createdAt: 'desc' },
       select: {
         title: true,
         content: true,
@@ -30,8 +32,9 @@ async function handler(
             cheers: true,
           }
         }
-      }
+      },
     })
+
     res.json({ ok: true, noteList })
 
   } else if (req.method === 'POST') {
