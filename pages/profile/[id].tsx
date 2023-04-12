@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import Custom404 from "pages/404";
 import useUser from "@libs/client/useUser";
+import { signOut } from "next-auth/react";
 
 interface UserInfo {
   ok: boolean;
@@ -76,6 +77,13 @@ const Home: NextPage = () => {
   const nicknameUpdate = () => {
     setNicknameUpdateFlag(!nicknameUpdateFlag);
   };
+
+  const logOut = async () => {
+    await signOut({ callbackUrl: "/enter" });
+    router.push("/note");
+    await fetch(`/api/users/logout`, { method: "GET" });
+  };
+
   if (user) {
     if (!data) {
       return <div>Loading...</div>;
@@ -198,6 +206,9 @@ const Home: NextPage = () => {
                 ""
               )}
             </div>
+          </div>
+          <div className="cursor-pointer p-4 bg-yellow-200" onClick={logOut}>
+            로그아웃하기
           </div>
           <div className="space-y-2 px-4 flex flex-col">
             <p>그동안 올린 고민들</p>
