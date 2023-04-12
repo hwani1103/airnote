@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useSWR from "swr";
 import type { LoginUser } from "@libs/client/utils";
+import useUser from "@libs/client/useUser";
+import Custom404 from "pages/404";
 interface NoteData {
   ok: boolean;
   noteInfo: {
@@ -27,6 +29,7 @@ interface NewReplyData {
 }
 
 const NoteCreate: NextPage = () => {
+  useUser();
   const router = useRouter();
   const { data: loginUser } = useSWR<LoginUser>("/api/users/me");
   const { data } = useSWR<NoteData>(
@@ -45,44 +48,56 @@ const NoteCreate: NextPage = () => {
     const dataWithReplyAuthor = {
       ...form,
       userId: data?.noteInfo.user.id, //게시글 작성자의 id 가 들어가야됨 !!
-      author: loginUser?.profile.nickname,
+      author: {
+        nickname: loginUser?.profile.nickname,
+        id: loginUser?.profile.id,
+      },
     };
     mutate(dataWithReplyAuthor); // 여기서, 로그인 사용자의 닉네임을 author로 보내주고.
   };
   useEffect(() => {
-    if (replyData) {
+    if (replyData && replyData.ok) {
       router.push(`/note/${router.query.id}/reply/${replyData.replyId}`);
     }
   }, [replyData]);
 
-  return (
-    <Layout>
-      <div>
-        <p>
-          답글 작성하기 여기서. note의 detail에서 정보를 가져온다음에 그걸
-          보여주고, 그걸 보면서 답글을 달 수 있는 기능을 구현하장.
-        </p>
-        <p>글쓴이 : {data?.noteInfo.user.nickname}</p>
-        <p>글제목 : {data?.noteInfo.title}</p>
-        <p>내용 : {data?.noteInfo.content}</p>
-        <form
-          onSubmit={handleSubmit(onValid)}
-          className="flex flex-col mx-auto space-y-2 mt-4"
-        >
-          <p className="text-xl">답글</p>
-          <textarea
-            className="resize-none h-60 rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
-            {...register("reply", {
-              required: true,
-            })}
-            id="content"
-          />
-          <button className="bg-indigo-500 p-2 rounded-full w-1/2 mx-auto text-white">
-            {loading ? "Loading..." : "전송"}
-          </button>
-        </form>
-      </div>
-    </Layout>
-  );
+  if (loginUser && loginUser.ok) {
+    if (!data) {
+      return <div>Loading...</div>;
+    } else if (!data.ok) {
+      return <Custom404 />;
+    }
+    return (
+      <Layout seoTitle={"ReplyCreate"}>
+        <div>
+          <p>
+            답글 작성하기 여기서. note의 detail에서 정보를 가져온다음에 그걸
+            보여주고, 그걸 보면서 답글을 달 수 있는 기능을 구현하장.
+          </p>
+          <p>글쓴이 : {data?.noteInfo.user.nickname}</p>
+          <p>글제목 : {data?.noteInfo.title}</p>
+          <p>내용 : {data?.noteInfo.content}</p>
+          <form
+            onSubmit={handleSubmit(onValid)}
+            className="flex flex-col mx-auto space-y-2 mt-4"
+          >
+            <p className="text-xl">답글</p>
+            <textarea
+              className="resize-none h-60 rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
+              {...register("reply", {
+                required: true,
+              })}
+              id="content"
+            />
+            <button className="bg-indigo-500 p-2 rounded-full w-1/2 mx-auto text-white">
+              {loading ? "Loading..." : "전송"}
+            </button>
+          </form>
+        </div>
+      </Layout>
+    );
+  } else {
+    return <div></div>;
+  }
 };
 export default NoteCreate;

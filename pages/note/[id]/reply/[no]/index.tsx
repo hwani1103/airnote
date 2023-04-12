@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import useSWR from "swr";
 import type { LoginUser } from "@libs/client/utils";
 import { User } from "@prisma/client";
+import Custom404 from "pages/404";
 interface NoteData {
   ok: true;
   noteInfo: {
@@ -37,14 +38,12 @@ const NoteCreate: NextPage = () => {
     router.query.id ? `/api/note/${router.query.id}/reply` : ""
   ); // 답글 수정화면에서도 원본의 제목내용을 보여줌
   const { data: replyData, mutate: prevReplyUpdate } = useSWR<ReplyData>(
-    router.query.id
-      ? `/api/note/${router.query.id}/reply/${router.query.no}/update`
-      : ""
+    `/api/note/${router.query.id}/reply/${router.query.no}/update`
   ); // defaultvalue로 사용할 이전 답글
 
   const [mutate, { loading, data: mutateResult }] = useMutation(
     `/api/note/${router.query.id}/reply/${router.query.no}/update`
-  ); // 이거는 수정해야함
+  );
 
   const { register, handleSubmit, reset } = useForm<ReplyForm>(); // rpely update form
 
@@ -52,23 +51,25 @@ const NoteCreate: NextPage = () => {
     if (loading) return;
     mutate(form);
   };
+  const updateReplyAsync = async () => {
+    if (mutateResult && mutateResult.ok) {
+      await prevReplyUpdate();
+      setUpdateFlag(false);
+    }
+  };
+  // 페이지 이동 X. 같은 페이지에서 update및 재렌더링이므로 useEffect와 async를 사용하여 응답을 받은 후 재렌더링하게 함.
   useEffect(() => {
-    // 페이지 이동 X. 같은 페이지에서 update및 재렌더링이므로 useEffect와 async를 사용하여 응답을 받은 후 재렌더링하게 함.
-    const updateReplyAsync = async () => {
-      if (mutateResult) {
-        await prevReplyUpdate();
-        setUpdateFlag(false);
-      }
-    };
-    updateReplyAsync();
+    if (mutateResult && mutateResult.ok) updateReplyAsync();
   }, [mutateResult]);
 
   const onDelete = () => {
-    fetch(`/api/note/${router.query.id}/reply/${router.query.no}/delete`, {
-      method: "GET",
-    }).then(() => {
-      router.push(`/note/${router.query.id}`);
-    });
+    if (router.query.id && router.query.no) {
+      fetch(`/api/note/${router.query.id}/reply/${router.query.no}/delete`, {
+        method: "GET",
+      }).then(() => {
+        router.push(`/note/${router.query.id}`);
+      });
+    }
   };
 
   const [updateFlag, setUpdateFlag] = useState(false);
@@ -78,8 +79,14 @@ const NoteCreate: NextPage = () => {
   const updateCancle = () => {
     setUpdateFlag(false);
   };
+
+  if (!replyData) {
+    return <div>Loading...</div>;
+  } else if (!replyData.ok) {
+    return <Custom404 />;
+  }
   return (
-    <Layout>
+    <Layout seoTitle={"ReplyDetail"}>
       <div>
         <p>
           여기서는 이전 글의 Note정보는 필요없고, Reply정보만 있으면됨. 그래서

@@ -9,7 +9,7 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id }, session: { user } } = req;
-
+  if (!id || !user) return res.status(400).end();
   const noteAuthor = await client.note.findUnique({
     where: {
       id: Number(id)

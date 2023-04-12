@@ -9,7 +9,7 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id } } = req;
-
+  if (!id) return res.status(400).end();
   if (req.method === 'GET') {
     const noteInfo = await client.note.findUnique({
       where: {
@@ -19,7 +19,6 @@ async function handler(
       select: {
         title: true,
         content: true,
-        userId: true,
         user: {
           select: {
             nickname: true,
@@ -28,12 +27,13 @@ async function handler(
         }
       }
     })
-
+    if (!noteInfo) return res.status(404).json({ ok: false })
     res.json({
       ok: true, noteInfo
     });
   } else if (req.method === 'POST') {
     const { body: { reply, author, userId }, session: { user } } = req;
+    if (user?.id !== author.id || !reply) return res.status(400)
     const newReply = await client.reply.create({
       data: {
         reply,
@@ -51,7 +51,7 @@ async function handler(
     })
     await client.notification.create({
       data: {
-        message: `${author}님이 회원님의 게시글에 댓글을 달았습니다.`,
+        message: `${author.nickname}님이 회원님의 게시글에 댓글을 달았습니다.`,
         user: {
           connect: {
             id: userId,

@@ -8,12 +8,12 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
   const { token } = req.body; // 요청에서 token을 뽑아낸다. tokenMutate(form)했으니까.
+  if (!token) return res.status(400).json({ ok: false });
   const foundToken = await client.token.findUnique({
     where: { payload: token }, // 생성된 payload가 요청의 token과 일치하는 token을 찾는다.
   });
 
   if (!foundToken) {
-
     return res.status(404).end(); // 없으면 리턴. 404
   } else if (foundToken.userId) {
     req.session.user = {

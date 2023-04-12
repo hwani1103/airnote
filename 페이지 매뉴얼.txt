@@ -74,6 +74,20 @@ useSWR로 /api/note/${router.query.id}/update로 겟요청.
 defaultValue로 넣어준다.
 useMutation으로 /api/note/${router.query.id}/update로 post요청. 진짜 수정 요청.
 
+==========
+layout.tsx, pages/index.tsx pages/enter.tsx note/index note/create note/[id]/index note/[id]/update
+
+
+
+
+
+
+
+
+
+
+
+
 ========================================서버코드
 
 ====================[api/users/me/index.ts]

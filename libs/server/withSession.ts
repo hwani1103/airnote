@@ -10,6 +10,7 @@ declare module "iron-session" {
 
 const cookieOptions = {
   cookieName: "airnote",
+
   password: process.env.COOKIE_PWD!,
 
 }
@@ -17,3 +18,4 @@ const cookieOptions = {
 export function withApiSession(fn: any) {
   return withIronSessionApiRoute(fn, cookieOptions);
 }
+

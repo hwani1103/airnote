@@ -36,20 +36,18 @@ const NoteUpdate: NextPage = () => {
   };
   useEffect(() => {
     // 이런 Case에서, if(data)가 없으면, data가 undefined일떄도 useEffect의 콜백이 동작하므로 조심해야함.
-    if (data) {
+    if (data && data.ok) {
       returnDetailPage();
       prevDataMutate();
     }
   }, [data]);
 
   const returnDetailPage = () => {
-    if (router.query.id) {
-      router.push(`/note/${router.query.id}`);
-    }
+    router.push(`/note/${router.query.id}`);
   };
 
   return (
-    <Layout>
+    <Layout seoTitle={"NoteUpdate"}>
       <div>
         <p>
           노트를 수정해봅시다. 여기서는 router.query.id로 일단 해당 게시물을
@@ -75,7 +73,7 @@ const NoteUpdate: NextPage = () => {
             defaultValue={noteData?.noteUpdate.content}
             className="resize-none h-60 rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
             {...register("content", {
-              required: false,
+              required: true,
             })}
             id="content"
           />

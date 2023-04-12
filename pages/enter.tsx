@@ -2,12 +2,9 @@ import type { NextPage } from "next";
 import { useForm } from "react-hook-form";
 import useMutation from "@libs/client/useMutation";
 import { useEffect } from "react";
-import useUser from "@libs/client/useUser";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import Layout from "@components/layout";
-import useSWR from "swr";
-import type { UserData } from "@components/layout";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 interface EnterForm {
   email: string;
@@ -53,14 +50,25 @@ const Enter: NextPage = () => {
     if (tokenData && tokenData.ok) {
       router.push("/");
     }
-  }, [tokenData, router]);
-
-  // if (data && data.ok) {
-  //   router.push("/");
-  // } 테스트하다가 이상없으면 삭제. 이거 왜적었는지 모르겠네?;--,
+  }, [tokenData]);
 
   return (
-    <Layout>
+    <Layout seoTitle={"Enter Page"}>
+      <p className="font-semibold text-xl shadow-lg text-slate-600">
+        로그인하기!
+      </p>
+      <button onClick={() => signIn("kakao", { callbackUrl: "/api/user" })}>
+        <p>카카오톡 로그인하기</p>
+      </button>
+      <br />
+      <button onClick={() => signIn("naver", { callbackUrl: "/api/user" })}>
+        <p>네이버 로그인하기</p>
+      </button>
+      <br />
+      <button onClick={() => signIn("google", { callbackUrl: "/api/user" })}>
+        <p>구글 로그인하기</p>
+      </button>
+
       {enterData && enterData.ok ? (
         <div>
           <p>토큰을 입력하세요.</p>

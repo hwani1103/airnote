@@ -8,8 +8,8 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
 
-  const { query: { id }, session: { user } } = req;
-
+  const { query: { id } } = req;
+  if (!id) return res.status(404).end();
   const userInfo = await client.user.findUnique({
     where: {
       id: Number(id),
@@ -21,6 +21,7 @@ async function handler(
       createdAt: true,
       gender: true,
       notes: {
+        orderBy: { createdAt: 'desc' },
         select: {
           title: true,
           id: true,
@@ -40,8 +41,11 @@ async function handler(
     }
 
   })
-
-  res.json({ ok: true, userInfo });
+  if (!userInfo) {
+    return res.json({ ok: false })
+  } else {
+    res.json({ ok: true, userInfo });
+  }
 
 }
 

@@ -9,8 +9,8 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id, no }, body: { replyUpdate }, session: { user } } = req;
+  if (!id || !no) return res.status(400).end();
   if (req.method === 'GET') {
-
     const prevReply = await client.reply.findFirst({
       where: {
         noteId: Number(id),
@@ -26,13 +26,18 @@ async function handler(
         }
       }
     })
+    if (!prevReply) {
+      return res.status(404).json({ ok: false })
+    } else {
 
-    res.json({
-      ok: true,
-      prevReply,
-    });
+      res.json({
+        ok: true,
+        prevReply,
+      });
+    }
 
   } else if (req.method === 'POST') {
+    if (!replyUpdate) return res.status(400).end();
     const replyAuthor = await client.reply.findUnique({
       where: {
         id: Number(no)
@@ -42,7 +47,7 @@ async function handler(
       }
     })
     if (replyAuthor?.userId !== user?.id) {
-      return res.status(404).json({ ok: false })
+      return res.status(400).json({ ok: false })
     }
     await client.reply.update({
       where: {

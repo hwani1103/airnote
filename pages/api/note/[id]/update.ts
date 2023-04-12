@@ -9,9 +9,7 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id }, body: { title, content }, session: { user } } = req;
-
   if (req.method === 'GET') {
-
     const noteUpdate = await client.note.findUnique({
       where: {
         id: Number(id),
@@ -19,14 +17,18 @@ async function handler(
       select: {
         title: true,
         content: true,
+        userId: true,
       }
     })
-
+    if (noteUpdate && noteUpdate.userId != user?.id) {
+      return res.status(400).json({ ok: false })
+    }
     res.json({
       ok: true,
       noteUpdate,
     });
   } else if (req.method === 'POST') {
+    if (!id || !title || !content) return res.status(400).end();
     const noteAuthor = await client.note.findUnique({
       where: {
         id: Number(id)

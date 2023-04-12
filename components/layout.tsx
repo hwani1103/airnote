@@ -4,17 +4,21 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import type { LoginUser } from "@libs/client/utils";
+import { signOut } from "next-auth/react";
+import Head from "next/head";
 interface LayoutProps {
   children: React.ReactNode;
+  seoTitle: string;
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, seoTitle }: LayoutProps) {
   const { data, isLoading, mutate } = useSWR<LoginUser>("/api/users/me");
   const router = useRouter();
 
   const logOut = async () => {
+    await signOut({ callbackUrl: "/enter" });
+    router.push("/note");
     await fetch(`/api/users/logout`, { method: "GET" });
-    router.push("/");
   };
 
   useEffect(() => {
@@ -23,6 +27,9 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div>
+      <Head>
+        <title>{seoTitle} | Airnote</title>
+      </Head>
       <div className="p-2 bg-green-200">
         {isLoading ? (
           <div>Loading...</div>

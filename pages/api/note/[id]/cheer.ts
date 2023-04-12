@@ -10,7 +10,7 @@ async function handler(
 ) {
 
   const { query: { id }, session: { user } } = req
-
+  if (!id) return res.status(400).end();
   const alreadyExists = await client.cheer.findFirst({
     where: {
       noteId: Number(id),
@@ -19,13 +19,11 @@ async function handler(
   })
 
   if (alreadyExists) {
-    console.log('이미있어서')
     await client.cheer.delete({
       where: {
         id: alreadyExists.id,
       }
     })
-    console.log('삭제함')
     res.json({ ok: true, toggle: false, })
   } else {
     await client.cheer.create({
@@ -45,8 +43,6 @@ async function handler(
     res.json({ ok: true, toggle: true, })
   }
 }
-
-
 
 
 export default withApiSession(

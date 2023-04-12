@@ -9,20 +9,22 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id }, body: { nickname }, session: { user } } = req;
-  console.log(id)
-  console.log(user?.id);
+
   if (id != user?.id) {
-    return res.json({ ok: false })
-  } else {
-    await client.user.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        nickname,
-      }
-    })
+    return res.status(400).json({ ok: false })
   }
+
+  if (!id || !nickname || !user) return res.status(400).end();
+
+  await client.user.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      nickname,
+    }
+  })
+
 
 
   res.json({ ok: true });

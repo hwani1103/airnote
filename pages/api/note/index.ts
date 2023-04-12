@@ -7,8 +7,8 @@ async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
-  const { skip = 0, take = 2 } = req.query;
-  console.log(skip, take)
+
+  const { skip = 0, take = 10 } = req.query;
   if (req.method === 'GET') {
     const noteList = await client.note.findMany({
       take: +take,
@@ -34,13 +34,15 @@ async function handler(
         }
       },
     })
-
     res.json({ ok: true, noteList })
 
+    //이게 이런문제가있네. GET요청은 isPrivate이 false지만, POST요청은 true여야됨. note를 만드는작업인데 당연히 로그인해야지.
+    //어쩔수없이 여기서 검증하자.
   } else if (req.method === 'POST') {
+    const { body: { title, content }, session: { user } } = req;
+    if (!user) return res.status(404).json({ ok: false })
+    if (!title || !content) return res.status(404).json({ ok: false })
 
-    const { body: { title, content } } = req;
-    const { session: { user } } = req;
     const newNote = await client.note.create({
       data: {
         title, content,
