@@ -17,9 +17,10 @@ model User {
   updatedAt     DateTime       @updatedAt
   email         String?        @unique
   nickname      String?
-  age           Int?
+  age           String?
   occupation    String?
   gender        String?
+  profileSet    Boolean        @default(false)
   tokens        Token[]
   notes         Note[]
   cheers        Cheer[]

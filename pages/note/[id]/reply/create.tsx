@@ -10,12 +10,16 @@ import useSWR from "swr";
 import type { LoginUser } from "@libs/client/utils";
 import useUser from "@libs/client/useUser";
 import Custom404 from "pages/404";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 interface NoteData {
   ok: boolean;
   noteInfo: {
     title: string;
     content: string;
     user: User;
+    _count: {
+      cheers: number;
+    };
   };
 }
 
@@ -69,31 +73,63 @@ const NoteCreate: NextPage = () => {
     }
     return (
       <Layout seoTitle={"ReplyCreate"}>
-        <div>
-          <p>
-            답글 작성하기 여기서. note의 detail에서 정보를 가져온다음에 그걸
-            보여주고, 그걸 보면서 답글을 달 수 있는 기능을 구현하장.
-          </p>
-          <p>글쓴이 : {data?.noteInfo.user.nickname}</p>
-          <p>글제목 : {data?.noteInfo.title}</p>
-          <p>내용 : {data?.noteInfo.content}</p>
+        <div className="pt-16 lg:pt-24 " />
+
+        <div className="w-[95%] mx-auto max-w-[1240px]">
+          <div className="p-2 border border-slate-700 rounded-lg space-y-2 pb-4">
+            <div className="flex justify-between">
+              <div className="flex rounded-xl px-1 divide-x divide-slate-400 items-center">
+                <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                  {data?.noteInfo.user.gender}{" "}
+                </p>
+                <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                  {data?.noteInfo.user.age}{" "}
+                </p>
+                <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                  {data?.noteInfo.user.occupation}{" "}
+                </p>
+              </div>
+              <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-yellow-900 border border-indigo-500 py-1 px-2 font-medium shadow-sm bg-white rounded-xl">
+                {data?.noteInfo?._count?.cheers}명이 응원해요!📯
+              </p>
+            </div>
+            <p className="pointer-events-none px-2 lg:px-3 lg:text-xl text-indigo-700">
+              {data?.noteInfo?.user.nickname} 님의 Note
+            </p>
+            <div className="space-y-2 border lg:space-y-4 lg:p-2 lg:text-xl border-slate-700 rounded-lg">
+              <p className="pointer-events-none p-2 border-b border-red-700">
+                {data?.noteInfo?.title}
+              </p>
+              <p className="pointer-events-none p-2 text-sm lg:text-base">
+                {data?.noteInfo?.content}
+              </p>
+            </div>
+          </div>
+
           <form
             onSubmit={handleSubmit(onValid)}
             className="flex flex-col mx-auto space-y-2 mt-4"
           >
             <p className="text-xl">답글</p>
             <textarea
-              className="resize-none h-60 rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
+              className="resize-none h-60 rounded-lg p-4 border-1 border-indigo-800"
               {...register("reply", {
                 required: true,
               })}
               id="content"
             />
-            <button className="bg-indigo-500 p-2 rounded-full w-1/2 mx-auto text-white">
-              {loading ? "Loading..." : "전송"}
+            <button className="bg-rose-300 max-w-[600px] w-full active:translate-x-1 hover:bg-red-700 hover:text-white p-2 rounded-full mx-auto text-black">
+              {loading ? (
+                <div className="flex justify-center items-center">
+                  <AiOutlineLoading3Quarters className="animate-spin mx-2 text-indigo-700 ring-1 ring-white rounded-full border-none " />
+                </div>
+              ) : (
+                "전송"
+              )}
             </button>
           </form>
         </div>
+        <div className="pt-16 lg:pt-24 " />
       </Layout>
     );
   } else {

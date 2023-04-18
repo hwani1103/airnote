@@ -9,7 +9,7 @@ async function handler(
 ): Promise<any> {
 
   const { query: { id, skip } } = req;
-  const noteList = await client.note.findMany({
+  const replyList = await client.reply.findMany({
     take: 5,
     skip: Number(skip),
     where: {
@@ -18,14 +18,7 @@ async function handler(
     orderBy: { createdAt: 'desc' }
   })
 
-  const totalNotes = await client.note.count({
-    where: {
-      userId: Number(id)
-    }
-  })
-
-
-  res.json({ ok: true, noteList, totalNotes })
+  res.json({ ok: true, replyList })
 
 }
 

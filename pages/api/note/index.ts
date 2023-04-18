@@ -24,6 +24,9 @@ async function handler(
           select: {
             nickname: true,
             id: true,
+            age: true,
+            occupation: true,
+            gender: true,
           }
         },
         _count: {

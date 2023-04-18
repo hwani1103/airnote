@@ -19,10 +19,19 @@ async function handler(
       select: {
         title: true,
         content: true,
+        id: true,
+        _count: {
+          select: {
+            cheers: true,
+          }
+        },
         user: {
           select: {
             nickname: true,
             id: true,
+            age: true,
+            gender: true,
+            occupation: true,
           }
         }
       }

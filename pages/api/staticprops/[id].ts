@@ -8,24 +8,16 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
 
-  const { query: { id, skip } } = req;
-  const noteList = await client.note.findMany({
-    take: 5,
-    skip: Number(skip),
-    where: {
-      userId: Number(id)
-    },
-    orderBy: { createdAt: 'desc' }
-  })
+  const { query: { id } } = req;
 
-  const totalNotes = await client.note.count({
+  const note = await client.note.findUnique({
     where: {
-      userId: Number(id)
+      id: Number(id),
     }
   })
 
 
-  res.json({ ok: true, noteList, totalNotes })
+  res.json({ ok: true, note })
 
 }
 

@@ -9,12 +9,17 @@ import useSWR from "swr";
 import type { LoginUser } from "@libs/client/utils";
 import { User } from "@prisma/client";
 import Custom404 from "pages/404";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 interface NoteData {
   ok: true;
   noteInfo: {
     title: string;
     content: string;
+    id: number;
     user: User;
+    _count: {
+      cheers: number;
+    };
   };
 }
 
@@ -77,6 +82,7 @@ const NoteCreate: NextPage = () => {
     setUpdateFlag(true);
   };
   const updateCancle = () => {
+    reset();
     setUpdateFlag(false);
   };
 
@@ -86,7 +92,116 @@ const NoteCreate: NextPage = () => {
     return <Custom404 />;
   }
   return (
-    <Layout seoTitle={"ReplyDetail"}>
+    <Layout seoTitle={"ReplyCreate"}>
+      <div className="pt-16 lg:pt-24 " />
+
+      <div className="w-[95%] mx-auto max-w-[1240px]">
+        <div className="p-2 border border-slate-700 rounded-lg space-y-2 pb-4">
+          <div className="flex justify-between">
+            <div className="flex rounded-xl px-1 divide-x divide-slate-400 items-center">
+              <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                {data?.noteInfo.user.gender}{" "}
+              </p>
+              <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                {data?.noteInfo.user.age}{" "}
+              </p>
+              <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-slate-500 px-1 font-medium shadow-sm">
+                {data?.noteInfo.user.occupation}{" "}
+              </p>
+            </div>
+            <p className="pointer-events-none text-sm lg:px-2 lg:text-base text-yellow-900 border border-indigo-500 py-1 px-2 font-medium shadow-sm bg-white rounded-xl">
+              {data?.noteInfo?._count?.cheers}명이 응원해요!📯
+            </p>
+          </div>
+          <Link href={`/note/${data?.noteInfo.id}`}>
+            <p className="pointer-events-none px-2 lg:px-3 lg:text-xl text-indigo-700">
+              {data?.noteInfo?.user.nickname} 님의 Note :{" "}
+              {data?.noteInfo?.title}
+            </p>
+          </Link>
+          <div className="space-y-2 border lg:space-y-4 lg:p-2 lg:text-xl border-slate-700 rounded-lg">
+            <p className="pointer-events-none p-4 text-base lg:text-lg">
+              {data?.noteInfo?.content}
+            </p>
+          </div>
+        </div>
+
+        {updateFlag ? (
+          <form
+            onSubmit={handleSubmit(onUpdate)}
+            className="flex flex-col mx-auto space-y-2 mt-4"
+          >
+            <p className="text-xl">답글 수정</p>
+            <textarea
+              className="resize-none h-60 border-2 border-red-500 active:border-none focus:border-none rounded-lg p-4  border-1"
+              {...register("replyUpdate", {
+                required: true,
+              })}
+              defaultValue={replyData?.prevReply.reply}
+              id="content"
+            />
+            <div className="flex">
+              <button
+                onClick={updateReply}
+                className="bg-red-300 lg:w-1/3 text-black  p-2 rounded-full w-1/2 mx-auto hover:bg-red-800 hover:text-white"
+              >
+                {loading ? (
+                  <div className="flex justify-center items-center">
+                    <AiOutlineLoading3Quarters className="animate-spin mx-2 text-indigo-700 ring-1 ring-white rounded-full border-none " />
+                  </div>
+                ) : (
+                  "저장"
+                )}
+              </button>
+              <button
+                onClick={updateCancle}
+                type="button"
+                className="bg-red-300 lg:w-1/3 text-black  p-2 rounded-full w-1/2 mx-auto hover:bg-red-800 hover:text-white"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="flex flex-col mx-auto space-y-2 mt-4">
+            <p className="text-xl">답글</p>
+            <textarea
+              className="pointer-events-none resize-none h-60 rounded-lg p-4 border-1 border-indigo-800"
+              defaultValue={replyData?.prevReply.reply}
+              readOnly
+              id="content"
+            />
+
+            {loginUser?.profile.id === replyData?.prevReply.userId ? (
+              <div className="flex">
+                <button
+                  type="button"
+                  onClick={updateReply}
+                  className="bg-red-300 lg:w-1/3 text-black  p-2 rounded-full w-1/2 mx-auto hover:bg-red-800 hover:text-white"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={onDelete}
+                  type="button"
+                  className="bg-red-300 lg:w-1/3 text-black  p-2 rounded-full w-1/2 mx-auto hover:bg-red-800 hover:text-white"
+                >
+                  삭제
+                </button>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+        )}
+      </div>
+      <div className="pt-16 lg:pt-24 " />
+    </Layout>
+  );
+};
+export default NoteCreate;
+{
+  /* <Layout seoTitle={"ReplyDetail"}>
       <div>
         <p>
           여기서는 이전 글의 Note정보는 필요없고, Reply정보만 있으면됨. 그래서
@@ -159,7 +274,5 @@ const NoteCreate: NextPage = () => {
         )}
         <p>답글 작성자 : {replyData?.prevReply.user.nickname}</p>
       </div>
-    </Layout>
-  );
-};
-export default NoteCreate;
+    </Layout> */
+}

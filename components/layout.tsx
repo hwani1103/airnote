@@ -7,6 +7,7 @@ import type { LoginUser } from "@libs/client/utils";
 import { signOut } from "next-auth/react";
 import Head from "next/head";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import Image from "next/image";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,22 +15,10 @@ interface LayoutProps {
 }
 
 export default function Layout({ children, seoTitle }: LayoutProps) {
-  // const { data, isLoading, mutate } = useSWR<LoginUser>("/api/users/me");
   const router = useRouter();
 
-  // const logOut = async () => {
-  //   await signOut({ callbackUrl: "/enter" });
-  //   router.push("/note");
-  //   await fetch(`/api/users/logout`, { method: "GET" });
-  // };
-
-  // useEffect(() => {
-  //   mutate();
-  // }, [router]);
-  //front 로직 시작
-
   const [nav, setNav] = useState(false);
-  const [color, setColor] = useState("white");
+  const [color, setColor] = useState("transparent");
   const [textColor, setTextColor] = useState("#222831");
   const handleNav = () => {
     setNav(!nav);
@@ -37,11 +26,11 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
 
   useEffect(() => {
     const changeColor = () => {
-      if (window.scrollY >= 60) {
+      if (window.scrollY >= 50) {
         setColor("#222831");
         setTextColor("white");
       } else {
-        setColor("white");
+        setColor("transparent");
         setTextColor("#222831");
       }
     };
@@ -56,9 +45,28 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
       setNav(!nav);
     }
   };
+  const aboutClick = async () => {
+    if (router.pathname == "/about") {
+      setNav(!nav);
+    } else {
+      await router.push("/about");
+      setNav(!nav);
+    }
+  };
+  const notesClick = async () => {
+    if (router.pathname == "/note") {
+      setNav(!nav);
+    } else {
+      await router.push("/note");
+      setNav(!nav);
+    }
+  };
 
   const confirmUser = async () => {
-    if (router.pathname == "/enter" && nav) {
+    if (
+      (router.pathname == "/enter" && nav) ||
+      router.pathname == "/profile/[id]"
+    ) {
       setNav(!nav);
     }
     const response = await fetch("/api/users/me", {
@@ -67,8 +75,9 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
         "Content-Type": "application/json",
       },
     });
+
     const loginUser: LoginUser = await response.json();
-    if (loginUser && !loginUser.ok) {
+    if ((loginUser && !loginUser.ok) || loginUser.profile == null) {
       router.push("/enter");
     } else {
       router.push(`/profile/${loginUser.profile.id}`);
@@ -76,7 +85,7 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
   };
 
   return (
-    <div className="mt-16 lg:mt-24">
+    <div className="relative">
       <Head>
         <title>{seoTitle} | Airnote</title>
       </Head>
@@ -86,37 +95,61 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
         ) : ( */}
         <div
           style={{ backgroundColor: `${color}` }}
-          className="fixed left-0 top-0 w-full z-10 ease-in duration-300"
+          className="fixed left-0 top-0 w-full z-10 ease-in duration-200"
         >
-          <div className="max-w-[1240px] m-auto flex justify-between items-center text-white p-2">
+          <div className="max-w-[1240px] m-auto flex justify-between items-center text-white px-4 py-1">
             <Link href="/">
-              <p
+              <Image
                 style={{ color: `${textColor}` }}
-                className="font-bold text-2xl"
-              >
-                Airnote
-              </p>
+                src={
+                  "https://imagedelivery.net/cuArFA48MvcYiHZ6Ed4L4Q/2443a15c-0131-4ae0-f023-d5d6b3165500/sixteenandnine"
+                }
+                alt=""
+                width={124}
+                height={69}
+                className="rounded-xl 
+                font-bold text-2xl hover:translate-x-1 ease-in-out duration-300"
+              ></Image>
             </Link>
             <ul className="hidden lg:flex">
-              <li className="p-4">
+              <li className="p-4 ">
                 <Link href="/">
-                  <p style={{ color: `${textColor}` }}>Home</p>
+                  <p
+                    className="ease-in-out duration-300 hover:ring p-1 hover:ring-green-500 hover:rounded-lg
+                    active:translate-x-2 "
+                    style={{ color: `${textColor}` }}
+                  >
+                    Home
+                  </p>
                 </Link>
               </li>
               <li className="p-4">
-                <Link href="/">
-                  <p style={{ color: `${textColor}` }}>About</p>
+                <Link href="/about">
+                  <p
+                    className="ease-in-out duration-300 hover:ring p-1 hover:ring-green-500 hover:rounded-lg
+                    active:translate-x-2"
+                    style={{ color: `${textColor}` }}
+                  >
+                    About
+                  </p>
                 </Link>
               </li>
               <li className="p-4">
-                <Link href="/">
-                  <p style={{ color: `${textColor}` }}>Notes</p>
+                <Link href="/note">
+                  <p
+                    className="ease-in-out duration-300 hover:ring p-1 hover:ring-green-500 hover:rounded-lg
+                    active:translate-x-2"
+                    style={{ color: `${textColor}` }}
+                  >
+                    Notes
+                  </p>
                 </Link>
               </li>
               <li className="p-4">
                 <p
+                  className="ease-in-out duration-300 hover:ring p-1 hover:ring-green-500 hover:rounded-lg
+                    active:translate-x-2 cursor-pointer"
                   onClick={confirmUser}
-                  className="cursor-pointer"
                   style={{ color: `${textColor}` }}
                 >
                   Account
@@ -151,14 +184,14 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
                   </button>
                 </li>
                 <li className="p-4 text-4xl hover:text-gray-500">
-                  <Link href="/">
+                  <button onClick={aboutClick}>
                     <p>About</p>
-                  </Link>
+                  </button>
                 </li>
                 <li className="p-4 text-4xl hover:text-gray-500">
-                  <Link href="/">
+                  <button onClick={notesClick}>
                     <p>Notes</p>
-                  </Link>
+                  </button>
                 </li>
                 <li className="p-4 text-4xl hover:text-gray-500">
                   <button type="button" onClick={confirmUser}>
@@ -172,76 +205,6 @@ export default function Layout({ children, seoTitle }: LayoutProps) {
         {/* )} */}
       </div>
       <div className="">{children}</div>
-
-      <div className="bg-[#222831] text-[#eeeeee] p-2 mt-12 relative bottom-0 left-0 right-0">
-        <p className="font-bold text-lg text-center">©Airnote</p>
-        <p className="font-bold text-sm">
-          오시는 길 : 서울시 양념구 치킨로 2마리 정말맛있길
-        </p>
-        <p className="font-bold text-sm">사업자 : Gogos</p>
-      </div>
     </div>
   );
 }
-
-{
-  /* 
-1. Layout에서 로그인 회원 정보에 대해 어떻게 제공할 것인가?
-로그인/ 로그아웃, 프로필 등 회원정보, 상태에 관한 모든건 Account버튼이 해결
-
-Account버튼을 클릭하면 ?
-users/me로 요청을 보내서, 에러면 enter로 redirect
-있으면, 그 id profile로 이동.
-
-그 외에, 로그인되기전에 어떤 권한있는 행위를 하려고 하면 enter로 redirect.
-*/
-}
-
-{
-  /* <Link
-                className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
-                href="/"
-              >
-                홈
-              </Link>
-              {data && data.ok ? (
-                <button
-                  onClick={logOut}
-                  className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
-                >
-                  {" "}
-                  로그아웃{" "}
-                </button>
-              ) : (
-                <Link
-                  className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
-                  href="/enter"
-                >
-                  로그인
-                </Link>
-              )}
-
-              <Link
-                className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
-                href="/note"
-              >
-                Note
-              </Link>
-              <Link
-                className="p-2 text-xl bg-indigo-200 rounded-lg border-2 border-sky-500"
-                href={`/profile/${data?.profile?.id}`}
-              >
-                Profile
-              </Link> */
-}
-
-// {data?.ok ? (
-//   <div className="flex flex-col">
-//     <div className="flex items-center space-x-8">
-//       <p className="text-2xl">로그인 성공.</p>
-//     </div>
-//     <p>{data?.profile?.nickname} 님 어서오세요.</p>
-//   </div>
-// ) : (
-//   <p> 로그인을 해주세요. </p>
-// )}

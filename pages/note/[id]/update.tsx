@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import useSWR from "swr";
-
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 interface noteUpdate {
   ok: boolean;
   noteUpdate: noteUpdateForm;
@@ -48,49 +48,59 @@ const NoteUpdate: NextPage = () => {
 
   return (
     <Layout seoTitle={"NoteUpdate"}>
-      <div>
-        <p>
-          노트를 수정해봅시다. 여기서는 router.query.id로 일단 해당 게시물을
-          조회해온 뒤 그 정보를 defaultValue로 넣어놓거나 해야함.. 오류생기면
-          거의 다 reset을 안해줬거나 register 이름 뭐 그런문제일 확률이 높다잉
-        </p>
+      <div className="pt-16 lg:pt-24 " />
+      <div className="p-2 max-w-[1240px] mx-auto">
         <form
           onSubmit={handleSubmit(onValid)}
-          className="flex flex-col mx-auto space-y-2 mt-4"
+          className="flex flex-col mx-auto space-y-4 mt-4"
         >
-          <p className="text-xl">제목</p>
+          <p className="text-xl lg:text-2xl">제목</p>
           <input
             defaultValue={noteData?.noteUpdate.title}
-            className="rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
+            className="rounded-lg p-4 border-1 border-indigo-800"
             {...register("title", {
               required: true,
             })}
             type="text"
             id="title"
           />
-          <p className="text-xl">내용</p>
+          <p className="text-xl lg:text-2xl">내용</p>
+
           <textarea
             defaultValue={noteData?.noteUpdate.content}
-            className="resize-none h-60 rounded-lg p-4 bg-indigo-100 border-1 border-indigo-800"
+            className="resize-none h-60 rounded-lg p-4 border-1 border-indigo-800"
             {...register("content", {
               required: true,
             })}
             id="content"
           />
-          <div>
-            <button className="bg-indigo-500 p-2 rounded-full w-1/2 mx-auto text-white">
-              저장
+          <div className="flex">
+            <button
+              className="bg-slate-200 p-2 rounded-full w-full mx-auto 
+          text-slate-800 text-xl border border-slate-700 
+          hover:text-slate-200 hover:bg-slate-600 active:translate-x-1 ease-in-out duration-300"
+            >
+              {loading ? (
+                <div className="flex justify-center items-center">
+                  <AiOutlineLoading3Quarters className="animate-spin mx-2 text-indigo-700 ring-1 ring-white rounded-full border-none " />
+                </div>
+              ) : (
+                "저장"
+              )}
             </button>
             <button
               onClick={returnDetailPage}
               type="button"
-              className="bg-indigo-500 p-2 rounded-full w-1/2 mx-auto text-white"
+              className="bg-slate-200 p-2 rounded-full w-full mx-auto 
+          text-slate-800 text-xl border border-slate-700 
+          hover:text-slate-200 hover:bg-slate-600 active:translate-x-1 ease-in-out duration-300"
             >
               취소
             </button>
           </div>
         </form>
       </div>
+      <div className="pt-16 lg:pt-24 " />
     </Layout>
   );
 };

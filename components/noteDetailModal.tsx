@@ -110,6 +110,7 @@ export default function NoteCreateModal({ handleFlag, noteId }: Props) {
 
   return (
     <div>
+      <div className="pt-16 lg:pt-24 " />
       <div className="fixed top-0 left-0 opacity-50 w-full h-full bg-black "></div>
       <div className="fixed top-10 right-0 left-0 bg-white w-[90%] h-[90%] mx-auto">
         <div className="flex flex-col space-y-2">
@@ -218,13 +219,15 @@ export default function NoteCreateModal({ handleFlag, noteId }: Props) {
             ""
           )}
           <button
+            type="button"
             onClick={handleFlag}
-            className="p-2 m-4 fixed top-0 right-0 bg-rose-600 text-white rounded-lg shadow-md"
+            className="p-2 m-4 fixed cursor-pointer z-20 top-0 right-20 bg-rose-600 text-white rounded-lg shadow-md"
           >
             닫기
           </button>
         </div>
       </div>
+      <div className="pt-16 lg:pt-24 " />
     </div>
   );
 }

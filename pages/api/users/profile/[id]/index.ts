@@ -20,24 +20,33 @@ async function handler(
       occupation: true,
       createdAt: true,
       gender: true,
-      notes: {
-        orderBy: { createdAt: 'desc' },
+      profileSet: true,
+      _count: {
         select: {
-          title: true,
-          id: true,
-        }
-      },
-      notifications: { // 알림을 눌러서 해당 답글로 가는것.
-        select: {
-          message: true,
-          reply: {
-            select: {
-              noteId: true,
-              id: true,
-            }
-          }
+          replies: true,
+          notifications: true,
+          notes: true,
         }
       }
+
+      // notes: {
+      //   orderBy: { createdAt: 'desc' },
+      //   select: {
+      //     title: true,
+      //     id: true,
+      //   }
+      // },
+      // notifications: { // 알림을 눌러서 해당 답글로 가는것.
+      //   select: {
+      //     message: true,
+      //     reply: {
+      //       select: {
+      //         noteId: true,
+      //         id: true,
+      //       }
+      //     }
+      //   }
+      // }
     }
 
   })
