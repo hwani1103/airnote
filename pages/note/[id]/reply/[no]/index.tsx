@@ -164,14 +164,15 @@ const NoteCreate: NextPage = () => {
           </form>
         ) : (
           <div className="flex flex-col mx-auto space-y-2 mt-4">
-            <p className="text-xl">답글</p>
+            <p className="text-xl">
+              {replyData?.prevReply.user.nickname}님의 답글
+            </p>
             <textarea
               className="pointer-events-none resize-none h-60 rounded-lg p-4 border-1 border-indigo-800"
               defaultValue={replyData?.prevReply.reply}
               readOnly
               id="content"
             />
-
             {loginUser?.profile.id === replyData?.prevReply.userId ? (
               <div className="flex">
                 <button
