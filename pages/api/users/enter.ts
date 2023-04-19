@@ -51,7 +51,7 @@ async function handler(
           },
           create: {
             email,
-            nickname: '랜덤 닉네임' // 마찬가지. 결국 email : email, name : name, 이런식으로 찾거나 생성하라 그말임. 지금은 필드 하나니까
+            nickname: 'Anonymous' // 마찬가지. 결국 email : email, name : name, 이런식으로 찾거나 생성하라 그말임. 지금은 필드 하나니까
           }, //그냥 ...user에서 email, 로 바꿨음.
         },
       },

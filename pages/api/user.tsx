@@ -7,37 +7,37 @@ import { getSession } from "next-auth/react";
 //NextAuth OAuth로그인 설정.
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req });
+  if (session?.user) {
+    const { email } = session?.user;
 
-  const { email } = session?.user!;
-  let user;
+    if (email) {
+      await client.user.upsert({
+        where: {
+          email,
+        },
+        create: {
+          email,
+          nickname: "Anonymous",
+        },
+        update: {},
+      });
 
-  if (email) {
-    user = await client.user.upsert({
-      where: {
-        email,
-      },
-      create: {
-        email,
-        nickname: "Anonymous",
-      },
-      update: {},
-    });
+      let currentUser = await client.user.findUnique({
+        where: {
+          email,
+        },
+      });
 
-    let currentUser = await client.user.findUnique({
-      where: {
-        email,
-      },
-    });
+      if (currentUser) {
+        req.session.user = {
+          id: currentUser.id,
+        };
+      }
 
-    if (currentUser) {
-      req.session.user = {
-        id: currentUser.id,
-      };
+      await req.session.save();
+
+      res.redirect("/");
     }
-
-    await req.session.save();
-
-    res.redirect("/");
   }
 }
 
