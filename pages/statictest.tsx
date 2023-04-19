@@ -15,7 +15,7 @@ const Home: NextPage<noteList> = (noteList) => {
     <div>
       <p>getStaticProps를 테스트해본다</p>
       <Link href="/statictestcreate.tsx">노트만들기</Link>
-      <div className="grid-cols-4 grid divide-x-2 p-4 gap-4 rounded-lg text-xl">
+      <div className="grid-cols-4 grid divide-x-1 p-1 gap-1 rounded-lg text-xl">
         {noteList?.noteList.map((note) => {
           return (
             <p key={note.id} className="m-1 bg-rose-200 p-1">

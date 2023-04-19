@@ -60,10 +60,11 @@ model Note {
   title     String
   content   String   @db.MediumText
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId  Int
-  cheers  Cheer[]
-  replies Reply[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        Int
+  cheers        Cheer[]
+  replies       Reply[]
+  notifications Notification[]
 
   @@index([userId])
 }
@@ -96,6 +97,10 @@ model Notification {
   reply   Reply @relation(fields: [replyId], references: [id], onDelete: Cascade)
   replyId Int
 
+  note   Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId Int
+
+  @@index([noteId])
   @@index([userId])
   @@index([replyId])
 }

@@ -190,10 +190,11 @@ const Home: NextPage = () => {
                     기본 프로필 설정 완료
                   </p>
                 ) : (
-                  <div className="flex items-center mt-4 space-x-2 cursor-pointer group lg:text-lg">
-                    <p onClick={openModal} className="text-slate-500">
-                      프로필 설정하기
-                    </p>
+                  <div
+                    onClick={openModal}
+                    className="flex items-center mt-4 space-x-2 cursor-pointer group lg:text-lg"
+                  >
+                    <p className="text-slate-500">프로필 설정하기</p>
                     <TbEdit className="text-slate-500 group-hover:text-2xl group-hover:text-indigo-500 ease-in-out duration-100 " />
                   </div>
                 )}
@@ -249,7 +250,7 @@ const Home: NextPage = () => {
           </div>
 
           {router.query.id == loginUser?.profile.id ? (
-            <div className="h-64 lg:w-[90%] rounded-lg border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto overflow-hidden">
+            <div className="h-64 lg:w-[90%] rounded-lg overflow-auto border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto ">
               <div className="border-b border-slate-700 overflow-auto">
                 {data?.userInfo._count.notifications > 0 ? (
                   <>
@@ -278,18 +279,24 @@ const Home: NextPage = () => {
                   </>
                 )}
               </div>
-              <div className="p-2 m-2 px-6">
-                <div className="space-y-2 divide-y divide-slate-500 p-2">
+              <div className="p-2 m-2 px-6 ">
+                <div className="space-y-2 divide-y divide-slate-500 p-2 ">
                   {notifications.length > 0
                     ? notifications.map((notification, i) => {
                         if (i < 5)
                           return (
-                            <p
-                              className="font-medium hover:text-indigo-500 cursor-pointer"
-                              key={notification.id}
-                            >
-                              {notification.message}
-                            </p>
+                            <>
+                              <Link
+                                href={`/note/${notification.noteId}/reply/${notification.replyId}`}
+                              >
+                                <div
+                                  className="font-medium hover:text-indigo-500"
+                                  key={notification.id}
+                                >
+                                  {notification.message}
+                                </div>
+                              </Link>
+                            </>
                           );
                       })
                     : ""}
@@ -361,7 +368,7 @@ const Home: NextPage = () => {
                             className="font-medium hover:text-indigo-500 cursor-pointer"
                             key={note.id}
                           >
-                            {note.title}
+                            <Link href={`/note/${note.id}`}>{note.title}</Link>
                           </p>
                         );
                     })
@@ -430,7 +437,11 @@ const Home: NextPage = () => {
                             className="font-medium hover:text-indigo-500 cursor-pointer"
                             key={reply.id}
                           >
-                            {reply.reply}
+                            <Link
+                              href={`/note/${reply.noteId}/reply/${reply.id}`}
+                            >
+                              {reply.reply}
+                            </Link>
                           </p>
                         );
                     })

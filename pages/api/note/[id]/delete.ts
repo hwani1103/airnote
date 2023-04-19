@@ -28,6 +28,7 @@ async function handler(
       id: Number(id),
     }
   })
+  await res.revalidate('/note')
   res.json({
     ok: true,
   });

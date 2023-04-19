@@ -1,6 +1,11 @@
 import withHandler, { ResponseType } from "@libs/server/withHandler";
 import { NextApiRequest, NextApiResponse } from "next";
 import client from "@libs/server/client";
+import mail from "@sendgrid/mail";
+
+mail.setApiKey(process.env.SENDGRID_KEY!);
+
+
 
 async function handler(
   req: NextApiRequest,
@@ -52,6 +57,15 @@ async function handler(
       },
     },
   });
+  if (email) {
+    const sendMail = await mail.send({
+      from: 'hwanine7@naver.com',
+      to: email,
+      subject: 'Your Airnote Verification Email',
+      text: `Your login token is ${payload}`,
+      html: `<strong>Airnote 로그인 토큰값은 ${payload} 입니다.</strong>`
+    })
+  }
 
   return res.json({
     ok: true,

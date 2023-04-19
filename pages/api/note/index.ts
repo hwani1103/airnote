@@ -8,11 +8,8 @@ async function handler(
   res: NextApiResponse<ResponseType>
 ): Promise<any> {
 
-  const { skip = 0, take = 10 } = req.query;
   if (req.method === 'GET') {
     const noteList = await client.note.findMany({
-      take: +take,
-      skip: +skip,
       orderBy: { createdAt: 'desc' },
       select: {
         title: true,
@@ -56,6 +53,7 @@ async function handler(
         }
       }
     })
+    await res.revalidate('/note')
 
     res.json({ ok: true, noteId: newNote.id });
   }

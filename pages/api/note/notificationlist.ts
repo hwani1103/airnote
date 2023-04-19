@@ -15,8 +15,10 @@ async function handler(
     where: {
       userId: Number(id)
     },
+
     orderBy: { createdAt: 'desc' }
   })
+
 
   res.json({ ok: true, notificationList })
 

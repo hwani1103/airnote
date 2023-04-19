@@ -60,7 +60,7 @@ async function handler(
     })
     await client.notification.create({
       data: {
-        message: `${author.nickname}님이 회원님의 게시글에 댓글을 달았습니다.`,
+        message: `${author.nickname}님이 회원님의 Note에 댓글을 달았습니다.`,
         user: {
           connect: {
             id: userId,
@@ -69,6 +69,11 @@ async function handler(
         reply: {
           connect: {
             id: newReply.id
+          }
+        },
+        note: {
+          connect: {
+            id: newReply.noteId
           }
         }
       },
