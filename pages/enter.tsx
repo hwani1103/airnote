@@ -92,7 +92,6 @@ const Enter: NextPage = () => {
               <div className="space-y-1 w-full">
                 <div onClick={handleInput} className="mb-2">
                   <p className="text-black lg:text-center lg:text-xl lg:p-2 lg:my-2 ">
-                    입력하신{" "}
                     <span className="p-1 border-b-2 text-lg border-orange-400 m-1">
                       {email}
                     </span>{" "}
