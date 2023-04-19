@@ -53,7 +53,7 @@ async function handler(
         }
       }
     })
-    await res.revalidate('/note')
+    // await res.revalidate('/note')
 
     res.json({ ok: true, noteId: newNote.id });
   }
