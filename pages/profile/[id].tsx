@@ -13,7 +13,7 @@ import useUser from "@libs/client/useUser";
 import { signOut } from "next-auth/react";
 import moment from "moment";
 import "moment/locale/ko";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/Io";
+// import { IoIosArrowBack, IoIosArrowForward } from "react-icons/Io";
 import { TbEdit } from "react-icons/tb";
 interface UserInfo {
   ok: boolean;
@@ -304,22 +304,26 @@ const Home: NextPage = () => {
 
                 {notificationFetch ? (
                   <div className="flex justify-around items-center m-2">
-                    <IoIosArrowBack
+                    <div
                       onClick={async () => {
                         await setNotificationSkip((prev) => {
                           return Math.max(prev - 5, 0);
                         });
                       }}
                       className="text-xl cursor-pointer"
-                    />
-                    <IoIosArrowForward
+                    >
+                      이전
+                    </div>
+                    <div
                       onClick={async () => {
                         await setNotificationSkip((prev) => {
                           return prev + 5;
                         });
                       }}
                       className="text-xl cursor-pointer"
-                    />
+                    >
+                      이후
+                    </div>
                   </div>
                 ) : (
                   ""
@@ -376,22 +380,26 @@ const Home: NextPage = () => {
               </div>
               {noteFetch ? (
                 <div className="flex justify-around items-center m-2">
-                  <IoIosArrowBack
+                  <div
                     onClick={async () => {
                       await setNoteSkip((prev) => {
                         return Math.max(prev - 5, 0);
                       });
                     }}
                     className="text-xl cursor-pointer"
-                  />
-                  <IoIosArrowForward
+                  >
+                    이전
+                  </div>
+                  <div
                     onClick={async () => {
                       await setNoteSkip((prev) => {
                         return prev + 5;
                       });
                     }}
                     className="text-xl cursor-pointer"
-                  />
+                  >
+                    이후
+                  </div>
                 </div>
               ) : (
                 ""
@@ -450,22 +458,26 @@ const Home: NextPage = () => {
 
               {replyFetch ? (
                 <div className="flex justify-around items-center m-2">
-                  <IoIosArrowBack
+                  <div
                     onClick={async () => {
                       await setReplySkip((prev) => {
                         return Math.max(prev - 5, 0);
                       });
                     }}
                     className="text-xl cursor-pointer"
-                  />
-                  <IoIosArrowForward
+                  >
+                    이전
+                  </div>
+                  <div
                     onClick={async () => {
                       await setReplySkip((prev) => {
                         return prev + 5;
                       });
                     }}
                     className="text-xl cursor-pointer"
-                  />
+                  >
+                    이후
+                  </div>
                 </div>
               ) : (
                 ""
