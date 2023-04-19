@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 import useMutation from "@libs/client/useMutation";
 import moment from "moment";
 import "moment/locale/ko";
-import { TfiCommentsSmiley } from "react-icons/Tfi";
 //여기서 필요한 정보 : Note id(router.query.id)를 가지고 API에 Note 및 Note를 작성한 User정보를 가져와야된다.
 //api/note/${}로 요청. router.query.id이용. 그럼 그걸 받아서. 노트정보 및 유저를 include해서 가져와주면 된다.
 
@@ -163,7 +162,7 @@ const NoteDetail: NextPage = () => {
           {data?.noteInfo.user.id !== loginUser?.profile?.id &&
           loginUser &&
           loginUser.ok ? (
-            <div className="flex space-x-3 justify-end">
+            <div className="flex space-x-2 justify-end">
               <div
                 className={cls(
                   cheerFlag
@@ -172,7 +171,7 @@ const NoteDetail: NextPage = () => {
                 )}
                 onClick={cheerToggle}
               >
-                <TfiCommentsSmiley className="block " />
+                <p className="text-sm">🥊힘내!</p>
               </div>
               <Link
                 className="bg-rose-300 hover:bg-rose-700 hover:text-white ease-in-out duration-200 lg:text-lg px-2 rounded-lg text-slate-700 border border-red-800"
