@@ -334,7 +334,7 @@ const Home: NextPage = () => {
             ""
           )}
 
-          <div className="h-64 lg:w-[90%] rounded-lg border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto overflow-hidden">
+          <div className="h-64 lg:w-[90%] rounded-lg border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto overflow-auto">
             <div className="border-b border-slate-700 overflow-auto">
               {data?.userInfo._count.notes > 0 ? (
                 <>
@@ -363,7 +363,7 @@ const Home: NextPage = () => {
               )}
             </div>
             <div className="p-2 m-2 px-6">
-              <div className="space-y-2 divide-y divide-slate-500 p-2">
+              <div className="space-y-1 divide-y divide-slate-500 p-1">
                 {notes.length > 0
                   ? notes.map((note, i) => {
                       if (i < 5)
@@ -407,7 +407,7 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          <div className="h-64 lg:w-[90%] rounded-lg border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto overflow-hidden">
+          <div className="h-64 lg:w-[90%] rounded-lg border lg:col-span-1 border-slate-700 w-[95%] col-span-2 mx-auto overflow-auto">
             <div className="border-b border-slate-700 overflow-auto">
               {data?.userInfo._count.replies > 0 ? (
                 <>
@@ -436,7 +436,7 @@ const Home: NextPage = () => {
               )}
             </div>
             <div className="p-2 m-2 px-6">
-              <div className="space-y-2 divide-y divide-slate-500 p-2">
+              <div className="space-y-1 divide-y divide-slate-500 p-1">
                 {replies.length > 0
                   ? replies.map((reply, i) => {
                       if (i < 5)

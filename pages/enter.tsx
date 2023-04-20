@@ -77,7 +77,7 @@ const Enter: NextPage = () => {
           <source src="skyvideo.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div className="lg:pt-16 absolute top-0 left-0 w-full flex flex-col items-center justify-center">
+        <div className="lg:pt-16 absolute top-0 left-0 w-full flex flex-col items-center justify-center ">
           <p className="text-white text-xl mt-4 font-bold lg:text-3xl">
             {" "}
             Airnote Login{" "}
@@ -89,7 +89,7 @@ const Enter: NextPage = () => {
           `}
           >
             {enterData && enterData.ok ? (
-              <div className="space-y-1 w-full">
+              <div className="space-y-1 w-full z-20">
                 <div onClick={handleInput} className="mb-2">
                   <p className="text-black lg:text-center lg:text-xl lg:p-2 lg:my-2 ">
                     <span className="p-1 border-b-2 text-lg border-orange-400 m-1">
@@ -128,7 +128,7 @@ const Enter: NextPage = () => {
                 </form>
               </div>
             ) : (
-              <div className="space-y-1 w-full mx-auto">
+              <div className="space-y-1 w-full mx-auto z-20">
                 <div onClick={handleInput} className="cursor-pointer">
                   {inputState ? (
                     <p className="text-black lg:text-center ease-in-out duration-200 lg:-translate-y-4 -translate-y-2 lg:text-xl lg:p-2 lg:my-2">
@@ -190,7 +190,7 @@ const Enter: NextPage = () => {
       </div>
 
       <div
-        className="flex flex-col justify-center items-center p-8 space-y-6 border-t border-slate-700 mt-8 relative w-full
+        className="flex flex-col justify-center items-center p-8 space-y-6 border-slate-700 mt-16 relative w-full
       lg:absolute lg:bottom-16 lg:p-0 lg:border-none xl:bottom-32
       "
       >
